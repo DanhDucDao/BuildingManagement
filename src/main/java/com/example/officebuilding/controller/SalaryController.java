@@ -1,7 +1,5 @@
 package com.example.officebuilding.controller;
 
-import com.example.officebuilding.dao.SalaryDAO;
-import com.example.officebuilding.dtos.CompanyDTO;
 import com.example.officebuilding.dtos.SalaryDTO;
 import com.example.officebuilding.service.salary.ISalaryService;
 import org.springframework.beans.factory.annotation.Autowired;

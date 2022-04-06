@@ -1,8 +1,12 @@
 package com.example.officebuilding.controller;
 
-import com.example.officebuilding.dao.CompanyEmployeeDAO;
 import com.example.officebuilding.dtos.CompanyEmployeeDTO;
+import com.example.officebuilding.entities.CompanyEmployeeEntity;
+import com.example.officebuilding.entities.CompanyEntity;
+import com.example.officebuilding.repository.ICompanyEmployeeRepository;
+import com.example.officebuilding.repository.ICompanyRepository;
 import com.example.officebuilding.service.company_employee.ICompanyEmployeeService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +20,16 @@ import java.util.Optional;
 @RequestMapping(value = "/api/company-employee", produces = "application/json")
 public class CompanyEmployeeController {
     @Autowired
-    private ICompanyEmployeeService companyEmployeeService;
+    private ModelMapper modelMapper;
+    @Autowired
+    private ICompanyEmployeeRepository companyEmployeeRepository;
+    @Autowired
+    private ICompanyRepository companyRepository;
 
     @Autowired
-    private CompanyEmployeeDAO companyEmployeeDAO;
+    private ICompanyEmployeeService companyEmployeeService;
+
+
 
     @PostMapping
     public ResponseEntity<CompanyEmployeeDTO> createNewCompanyEmployee(@RequestBody CompanyEmployeeDTO companyEmployeeDTO){
@@ -65,7 +75,10 @@ public class CompanyEmployeeController {
 
     @PostMapping("/companyId={id}")
     public void insertEmployeeOfCompany(@PathVariable Integer id, @RequestBody CompanyEmployeeDTO companyEmployeeDTO){
-        companyEmployeeDAO.insertCompanyEmployeeByCompanyId(id,companyEmployeeDTO);
+        CompanyEmployeeEntity companyEmployeeEntity = modelMapper.map(companyEmployeeDTO,CompanyEmployeeEntity.class);
+        CompanyEntity companyEntity = companyRepository.getById(id);
+        companyEmployeeEntity.setCompany(companyEntity);
+        companyEmployeeRepository.save(companyEmployeeEntity);
     }
 
     @GetMapping("/get-by-name")

@@ -1,9 +1,10 @@
 package com.example.officebuilding.service.salary;
 
-import com.example.officebuilding.dao.SalaryDAO;
 import com.example.officebuilding.dtos.SalaryDTO;
 import com.example.officebuilding.entities.SalaryEntity;
+import com.example.officebuilding.entities.ServiceEntity;
 import com.example.officebuilding.repository.ISalaryRepository;
+import com.example.officebuilding.repository.IServiceRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,12 @@ import java.util.stream.Collectors;
 public class SalaryService implements ISalaryService{
     @Autowired
     private ModelMapper modelMapper;
-
+    @Autowired
+    private IServiceRepository serviceRepository;
     @Autowired
     private ISalaryRepository salaryRepository;
 
-    @Autowired
-    private SalaryDAO salaryDAO;
+
 
     @Override
     public List<SalaryDTO> findAll() {
@@ -74,6 +75,13 @@ public class SalaryService implements ISalaryService{
 
     @Override
     public void createNewSalaryByServiceId(Integer serviceId, SalaryDTO salaryDTO) {
-        salaryDAO.createSalaryForService(serviceId,salaryDTO);
+
+
+
+        ServiceEntity serviceEntity = serviceRepository.getById(serviceId);
+        SalaryEntity salaryEntity = modelMapper.map(salaryDTO,SalaryEntity.class);
+        salaryEntity.setService(serviceEntity);
+        salaryRepository.save(salaryEntity);
+
     }
 }

@@ -5,7 +5,9 @@ import com.example.officebuilding.dtos.BuildingEmployeeDTO;
 import com.example.officebuilding.dtos.BuildingEmployeeDTO;
 import com.example.officebuilding.dtos.CompanyDTO;
 import com.example.officebuilding.entities.BuildingEmployeeEntity;
+import com.example.officebuilding.entities.SalaryEntity;
 import com.example.officebuilding.repository.IBuildingEmployeeRepository;
+import com.example.officebuilding.repository.ISalaryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,8 @@ import java.util.stream.Collectors;
 public class BuildingEmployeeService implements IBuildingEmployeeService {
     @Autowired
     private ModelMapper modelMapper;
-
+@Autowired
+private ISalaryRepository salaryRepository;
     @Autowired
     private IBuildingEmployeeRepository buildingEmployeeRepository;
 
@@ -93,7 +96,10 @@ public class BuildingEmployeeService implements IBuildingEmployeeService {
 
     @Override
     public void createNewBuildingEmployeeBySalaryId(Integer salaryId, BuildingEmployeeDTO buildingEmployeeDTO){
-        buildingEmployeeDAO.createBuildingEmployeeBySalaryId(salaryId, buildingEmployeeDTO);
+        SalaryEntity salaryEntity = salaryRepository.getById(salaryId);
+        BuildingEmployeeEntity buildingEmployeeEntity = modelMapper.map(buildingEmployeeDTO,BuildingEmployeeEntity.class);
+        buildingEmployeeEntity.setSalary(salaryEntity);
+        buildingEmployeeRepository.save(buildingEmployeeEntity);
     }
 
     @Override
@@ -103,6 +109,8 @@ public class BuildingEmployeeService implements IBuildingEmployeeService {
 
     @Override
     public void updateBuildingEmployee(Integer empId, Integer salaryId, BuildingEmployeeDTO buildingEmployeeDTO){
+
+
         buildingEmployeeDAO.updateBuildingEmployee(empId, salaryId, buildingEmployeeDTO);
     }
 }

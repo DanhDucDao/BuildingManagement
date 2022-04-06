@@ -1,6 +1,5 @@
 package com.example.officebuilding.service.company;
 
-import com.example.officebuilding.dao.ServiceContractDAO;
 import com.example.officebuilding.dtos.CompanyDTO;
 import com.example.officebuilding.dtos.MonthDTO;
 import com.example.officebuilding.dtos.MonthlyFeeOfCompanyDTO;
@@ -8,7 +7,6 @@ import com.example.officebuilding.dtos.ServiceContractDTO;
 import com.example.officebuilding.entities.*;
 import com.example.officebuilding.repository.*;
 import com.example.officebuilding.service.contract.IContractService;
-import com.example.officebuilding.service.service.IServiceService;
 import com.example.officebuilding.service.service_contract.IServiceContractService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +26,7 @@ public class CompanyService implements ICompanyService{
     private ICompanyEmployeeRepository companyEmployeeRepository;
     @Autowired
     private IServiceRepository serviceRepository;
-    @Autowired
-    private ServiceContractDAO serviceContractDAO;
+
     @Autowired
     private IServiceContractRepository serviceContractRepository;
     @Autowired
@@ -88,8 +85,11 @@ public class CompanyService implements ICompanyService{
             ServiceContractDTO serviceContractDTO = new ServiceContractDTO();
             serviceContractDTO.setStartDate(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
             serviceContractDTO.setDescription("Dịch vụ bắt buộc");
-            serviceContractDAO.createServiceContract(companyEntity.getId(),requiredService.getId(),serviceContractDTO);
-        });
+            ServiceContractEntity serviceContractEntity = modelMapper.map(serviceContractDTO,ServiceContractEntity.class);
+            serviceContractEntity.setCompany(companyEntity);
+            serviceContractEntity.setService(requiredService);
+            serviceContractRepository.save(serviceContractEntity);
+          });
 
         // Chuyển lại đối tượng entity đã được cập nhật sang DTO để trả về:
         return modelMapper.map(updatedCompanyEntity,CompanyDTO.class);

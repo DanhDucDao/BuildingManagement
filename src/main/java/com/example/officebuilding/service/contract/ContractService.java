@@ -1,9 +1,10 @@
 package com.example.officebuilding.service.contract;
 
-import com.example.officebuilding.dao.ContractDAO;
 import com.example.officebuilding.dtos.ContractDTO;
+import com.example.officebuilding.entities.CompanyEntity;
 import com.example.officebuilding.entities.ContractEntity;
 import com.example.officebuilding.entities.FloorEntity;
+import com.example.officebuilding.repository.ICompanyRepository;
 import com.example.officebuilding.repository.IContractRepository;
 import com.example.officebuilding.repository.IFloorRepository;
 import org.modelmapper.ModelMapper;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class ContractService implements IContractService{
     @Autowired
-    private ContractDAO contractDAO;
+    private ICompanyRepository companyRepository;
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
@@ -86,7 +87,12 @@ public class ContractService implements IContractService{
 
     @Override
     public void createContract(Integer companyId, Integer floorId, ContractDTO contractDTO) {
-        contractDAO.createContract(companyId, floorId, contractDTO);
+        ContractEntity contractEntity = modelMapper.map(contractDTO,ContractEntity.class);
+        FloorEntity floorEntity = floorRepository.getById(floorId);
+        CompanyEntity companyEntity = companyRepository.getById(companyId);
+        contractEntity.setFloor(floorEntity);
+        contractEntity.setCompany(companyEntity);
+        contractRepository.save(contractEntity);
     }
 
     @Override
