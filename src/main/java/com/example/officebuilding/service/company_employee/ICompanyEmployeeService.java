@@ -9,4 +9,5 @@ public interface ICompanyEmployeeService extends IGeneralService<CompanyEmployee
     public List<CompanyEmployeeDTO> findAllEmployeeOfCompany(Integer id);
     public int countCompanyEmployeesByCompanyID(Integer companyId);
     List<CompanyEmployeeDTO> findEmployeesByNameAndCompanyId(String empName,Integer companyId);
+
 }

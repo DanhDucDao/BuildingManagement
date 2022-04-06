@@ -1,10 +1,12 @@
 package com.example.officebuilding.service.service_contract;
 
-import com.example.officebuilding.dao.ServiceContractDAO;
-import com.example.officebuilding.dtos.MessageDTO;
 import com.example.officebuilding.dtos.ServiceContractDTO;
+import com.example.officebuilding.entities.CompanyEntity;
 import com.example.officebuilding.entities.ServiceContractEntity;
+import com.example.officebuilding.entities.ServiceEntity;
+import com.example.officebuilding.repository.ICompanyRepository;
 import com.example.officebuilding.repository.IServiceContractRepository;
+import com.example.officebuilding.repository.IServiceRepository;
 import com.example.officebuilding.service.monthly_service_bill.IMonthlyServiceBillService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +24,17 @@ import java.util.stream.Collectors;
 public class ServiceContractService implements IServiceContractService{
     @Autowired
     private ModelMapper modelMapper;
-
+@Autowired
+private ICompanyRepository companyRepository;
+@Autowired
+private IServiceRepository serviceRepository;
     @Autowired
     private IServiceContractRepository serviceContractRepository;
 
     @Autowired
     private IMonthlyServiceBillService monthlyServiceBillService;
 
-    @Autowired
-    private ServiceContractDAO serviceContractDAO;
+
 
     @Override
     public List<ServiceContractDTO> findAll() {
@@ -133,9 +137,13 @@ public class ServiceContractService implements IServiceContractService{
             return Optional.empty();
         }
 
-        // Nếu pass bước kiểm tra, ko có contract nào của company và service đó thì lưu xuống database
-        serviceContractDAO.createServiceContract(companyId,serviceId,serviceContractDTO);
 
+        ServiceContractEntity serviceContractEntity = modelMapper.map(serviceContractDTO,ServiceContractEntity.class);
+        CompanyEntity companyEntity = companyRepository.getById(companyId);
+        ServiceEntity serviceEntity = serviceRepository.getById(serviceId);
+        serviceContractEntity.setCompany(companyEntity);
+        serviceContractEntity.setService(serviceEntity);
+        serviceContractRepository.save(serviceContractEntity);
         // Lấy lại thằng service đã lưu rồi trả về
         return Optional.of(
                 modelMapper.map(serviceContractRepository.findServiceContractEntityByCompany_IdAndService_Id(companyId,serviceId)

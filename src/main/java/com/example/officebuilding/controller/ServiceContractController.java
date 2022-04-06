@@ -1,6 +1,5 @@
 package com.example.officebuilding.controller;
 
-import com.example.officebuilding.dao.ServiceContractDAO;
 import com.example.officebuilding.dtos.MessageDTO;
 import com.example.officebuilding.dtos.ServiceContractDTO;
 import com.example.officebuilding.service.service_contract.IServiceContractService;
